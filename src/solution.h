@@ -13,10 +13,12 @@ typedef long long ll;
 
 class CurrentState {
 public:
-    static int fps;
-    static ll money;
-    static int robot_num;
-    static int station_num;
+    int fps;
+    ll money;
+    int robot_num;
+    int station_num;
+
+    CurrentState();
 };
 
 class solution {
@@ -25,5 +27,5 @@ class solution {
 
 extern unordered_map<int, Station*> station_map;
 extern unordered_map<int, Robot*> robot_map;
-
+extern CurrentState currentState;
 #endif //HUAWEI_CODECRAFT_2023_SOLUTION_H

@@ -21,7 +21,7 @@ int main() {
     fflush(stdout);
     int frameID;
     while (scanf("%d", &frameID) != EOF) {
-        CurrentState::fps = frameID;
+        currentState.fps = frameID;
         Reader::readFps();
 
 
