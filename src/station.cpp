@@ -4,10 +4,30 @@
 
 #include "station.h"
 
-vector<Station *> station_list;
+const int stationTypeCnt = 9;
 
-Station::Station(int id, int type, const PFF &coordinate, int remainTime, int material, int product) :
-        id(id), type(type), coordinate(coordinate), remain_time(remainTime), material(material), product(product) {}
+vector<Station *> station_list;
+unordered_map<int, StationInfo> stationInfo;
+
+Station::Station(int id, int type,
+                 const PFF &coordinate,
+                 int remainTime,
+                 int material,
+                 int product) :
+            id(id), type(type),
+            coordinate(coordinate),
+            remain_time(remainTime),
+            material(material),
+            product(product) {
+    if (stationInfo.count(type) == 0) {
+        stationInfo[type] = *new StationInfo(type);
+    }
+}
 
 Station::Station(int id, int type, const PFF &coordinate) :
-        id(id), type(type), coordinate(coordinate), remain_time(-1), material(0), product(0) {}
+        id(id), type(type), coordinate(coordinate),
+        remain_time(-1), material(0), product(0) {
+    if (stationInfo.count(type) == 0) {
+        stationInfo[type] = *new StationInfo(type);
+    }
+}
