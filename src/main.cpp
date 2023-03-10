@@ -1,4 +1,6 @@
 #include <iostream>
+#include "reader.h"
+
 using namespace std;
 
 bool readUntilOK() {
@@ -13,12 +15,16 @@ bool readUntilOK() {
 }
 
 int main() {
-    readUntilOK();
+
+    Reader::readMap();
     puts("OK");
     fflush(stdout);
     int frameID;
     while (scanf("%d", &frameID) != EOF) {
-        readUntilOK();
+        CurrentState::fps = frameID;
+        Reader::readFps();
+
+
         printf("%d\n", frameID);
         int lineSpeed = 3;
         double angleSpeed = 1.5;
