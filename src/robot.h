@@ -9,6 +9,8 @@
 using namespace std;
 typedef pair<float, float> PFF;
 
+
+
 class Robot {
 public:
     int id;             // 机器人ID
