@@ -64,8 +64,7 @@ bool Reader::readMap() {
                 auto* s = new Station(station_id, line[i] - '0', {x, y});
                 station_map[station_id++] = s;
                 station_list.push_back(s);
-                // 初始条件下，所有机器均有需求
-                request_block_queue.push_back(new Station_Request(station_id, line[i] - '0'));
+                // 初始条件下，所有机器均有购买资源需求
             } else if (line[i] == 'A') {
                 auto* r = new Robot(robot_id, {x, y});
                 robot_map[robot_id++] = r;
@@ -97,6 +96,15 @@ void Reader::parse_station(int id, char *text) {
     station->remain_time = stoi(item[3]);
     station->material = stoi(item[4]);
     station->product = stoi(item[5]);
+    int type = station->type;
+    int req_material = stationInfo[type]->whichMaterial - station->material;
+    for (int i = 0; i < 10; i++) {
+        int tmp = req_material >> i;
+        if (tmp & 1) {
+            product_bst[i].set(id);
+        }
+    }
+
 }
 
 void Reader::parse_robot(int id, char *text) {

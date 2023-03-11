@@ -10,8 +10,11 @@
 #include <vector>
 #include <unordered_map>
 
+
 using namespace std;
 typedef pair<float, float> PFF;
+
+
 
 class StationInfo {
 public:
@@ -34,6 +37,15 @@ public:
     Station(int id, int type, const PFF &coordinate, int remainTime, int material, int product);
     Station(int id, int type, const PFF &coordinate);
 
+};
+
+class StationRequest {
+public:
+    int id;
+    int type;
+
+public:
+    StationRequest(int id, int type);
 };
 
 extern unordered_map<int, StationInfo*> stationInfo;

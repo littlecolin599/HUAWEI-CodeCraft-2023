@@ -77,3 +77,4 @@ StationInfo::StationInfo(int type): type(type) {
 }
 
 
+StationRequest::StationRequest(int id, int type) : id(id), type(type) {}

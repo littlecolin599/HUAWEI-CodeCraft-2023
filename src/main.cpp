@@ -13,7 +13,7 @@ int main() {
         currentState.fps = frameID;
         Reader::readFps();
         Solution::deal_fps();
-/*        printf("%d\n", frameID);
+/*      printf("%d\n", frameID);
         int lineSpeed = 3;
         double angleSpeed = 1.5;
         for(int robotId = 0; robotId < 4; robotId++){
