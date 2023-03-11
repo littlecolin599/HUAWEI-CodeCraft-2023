@@ -13,6 +13,12 @@
 using namespace std;
 typedef pair<float, float> PFF;
 
+enum STATUS {
+    DEFAULT = 0,
+    BUY,
+    SELL
+};
+
 class StationInfo {
 public:
     StationInfo(int type);
