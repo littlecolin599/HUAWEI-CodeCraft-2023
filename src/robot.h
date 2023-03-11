@@ -4,6 +4,7 @@
 
 #ifndef HUAWEI_CODECRAFT_2023_ROBOT_H
 #define HUAWEI_CODECRAFT_2023_ROBOT_H
+#include "solution.h"
 #include <utility>
 #include <vector>
 #include "station.h"
