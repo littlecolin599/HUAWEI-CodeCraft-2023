@@ -13,7 +13,11 @@
 
 typedef long long ll;
 
-
+enum STATUS {
+    DEFAULT = 0,
+    BUY,
+    SELL
+};
 class CurrentState {
 public:
     int fps;
