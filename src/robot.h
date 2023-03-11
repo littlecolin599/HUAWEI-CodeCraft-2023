@@ -30,6 +30,7 @@ public:
 };
 
 extern vector<Robot*> robot_list;
+extern vector<Robot *> robot_work_queue;
 
 
 #endif //HUAWEI_CODECRAFT_2023_ROBOT_H

@@ -64,11 +64,13 @@ bool Reader::readMap() {
                 auto* s = new Station(station_id, line[i] - '0', {x, y});
                 station_map[station_id++] = s;
                 station_list.push_back(s);
-
+                // 初始条件下，所有机器均有需求
+                request_block_queue.push_back(new Station_Request(station_id, line[i] - '0'));
             } else if (line[i] == 'A') {
                 auto* r = new Robot(robot_id, {x, y});
                 robot_map[robot_id++] = r;
                 robot_list.push_back(r);
+                robot_work_queue.push_back(r);      // 初始条件下，所有机器人都是空闲的
             }
         }
         height--;

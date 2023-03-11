@@ -5,6 +5,7 @@
 #include "robot.h"
 
 vector<Robot *> robot_list;
+vector<Robot *> robot_work_queue;
 
 Robot::Robot(int id, int station, int belong, float timeVal, float crushVal, float omega, const PFF &velocity, float direction,
              const PFF &coordinate) : id(id), station(station), belong(belong), time_val(timeVal), crush_val(crushVal),
