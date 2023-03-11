@@ -25,9 +25,10 @@ public:
 };
 class Station_Request {
 public:
-    int id;     // 请求工作台的id
-    int type;   // 请求的资源
-    Station_Request(int id, int type);
+    int id;                                 // 请求工作台的id
+    int type;                               // 请求资源的种类
+    STATUS status;                             // 请求 买/卖 资源
+    Station_Request(int id, int type, STATUS status);
     bool operator < (const Station_Request& s) const;
 };
 
@@ -35,6 +36,7 @@ class Solution {
 public:
     static void deal_fps();
     static float calc_dis(PFF p1, PFF p2);
+    static void deal_work();
 };
 
 extern unordered_map<int, Station*> station_map;
