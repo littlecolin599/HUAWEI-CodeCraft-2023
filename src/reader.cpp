@@ -100,7 +100,10 @@ void Reader::parse_station(int id, char *text) {
     station->material = stoi(item[4]);
     station->product = stoi(item[5]);
     int type = station->type;
-    int req_material = stationInfo[type]->whichMaterial - station->material;
+    int req_material = stationInfo[type]->whichMaterial - station->curMaterial;
+    if (type == 3 && req_material != 0) {
+        std:cerr << "req_material " << req_material << endl;
+    }
     for (int i = 0; i < TYPE_NUM; i++) {
         int tmp = req_material >> i;
         if (tmp & 1) {

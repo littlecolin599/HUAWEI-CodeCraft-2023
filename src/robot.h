@@ -23,6 +23,7 @@ public:
     int id;             // 机器人ID
     int station;        // 所处的工作站台
     int belong;         // 携带的物品
+    int carry;
     float time_val;     // 时间价值系数
     float crush_val;    // 碰撞价值系数
     float omega;        // 角速度

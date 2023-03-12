@@ -13,6 +13,7 @@
 
 using namespace std;
 typedef pair<float, float> PFF;
+typedef pair<int, int> PII;
 
 
 
@@ -33,7 +34,9 @@ public:
     PFF coordinate;     // 坐标
     int remain_time;    // 剩余生产时间
     int material;       // 材料格
+    int curMaterial;
     int product;        // 产品格
+    bool hasRequest;
     Station(int id, int type, const PFF &coordinate, int remainTime, int material, int product);
     Station(int id, int type, const PFF &coordinate);
 
@@ -43,6 +46,7 @@ class StationRequest {
 public:
     int id;
     int type;
+    PII src_dst;
 
     bool operator<(const StationRequest &rhs) const;
 
