@@ -10,7 +10,8 @@
 
 unordered_map<int, Station *> station_map;
 unordered_map<int, Robot *> robot_map;
-vector<bitset<K>> product_bst(10);
+vector<vector<int>> destination_table(TYPE_NUM);
+
 
 priority_queue<StationRequest*> station_req_queue;
 
@@ -23,16 +24,12 @@ CurrentState::CurrentState() : fps(0), money(0),
 }
 
 
-
-
 // 读取完成之后，处理每一帧的数据
 void Solution::deal_fps() {
 
-
-
     for (auto *station : station_list) {
         int type = station->type;
-        if (station->product == 1 && product_bst[type].count()) {
+        if (station->product == 1 && destination_table[type].size() > 0) {
             station_req_queue.push(new StationRequest(station->id, station->type));
         }
     }
@@ -63,12 +60,8 @@ void Solution::deal_work() {
                 cout << "buy " << robot->id << endl;
                 robot->status = SELL;
                 int type = robot->belong;
-                for (int i = K; i; --i) {
-                    if (product_bst[type].test(i)) {
-                        robot->destination = i;
-                        break;
-                    }
-                }
+                robot->destination = destination_table[type].back();
+                destination_table[type].pop_back();
             } else if (robot->status == SELL) {
                 cout << "sell " << robot->id << endl;
                 robot->reset();

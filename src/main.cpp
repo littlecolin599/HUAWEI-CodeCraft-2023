@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 #include "reader.h"
 #include "solution.h"
 
@@ -11,6 +12,10 @@ int main() {
     int frameID;
     while (scanf("%d", &frameID) != EOF) {
         currentState.fps = frameID;
+        printf("%d\n", frameID);
+        if (frameID == 800) {
+            sleep(100);
+        }
         Reader::readFps();
         Solution::deal_fps();
 /*      printf("%d\n", frameID);
@@ -20,7 +25,9 @@ int main() {
             printf("forward %d %d\n", robotId, lineSpeed);
             printf("rotate %d %f\n", robotId, angleSpeed);
         }
-        printf("OK\n");*/
+        */
+
+        printf("OK\n");
         fflush(stdout);
     }
     return 0;

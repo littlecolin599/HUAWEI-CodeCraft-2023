@@ -17,6 +17,9 @@ bool Reader::readFps() {
     CHECK_STATE check_state = HEADER;
     int robot_id = 0;
     int station_id = 0;
+    for (int i = 0; i < TYPE_NUM; ++i) {
+        destination_table[i].clear();
+    }
     while (fgets(line, sizeof line, stdin)) {
         if (line[0] == 'O' && line[1] == 'K') {
             return true;
@@ -98,10 +101,11 @@ void Reader::parse_station(int id, char *text) {
     station->product = stoi(item[5]);
     int type = station->type;
     int req_material = stationInfo[type]->whichMaterial - station->material;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < TYPE_NUM; i++) {
         int tmp = req_material >> i;
         if (tmp & 1) {
-            product_bst[i].set(id);
+            destination_table[i].push_back(id);
+            //std::cerr << "product " << i << "'s destiation is " << id << "(type == )" << type << endl;
         }
     }
 

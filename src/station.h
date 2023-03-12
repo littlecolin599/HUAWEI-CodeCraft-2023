@@ -44,6 +44,8 @@ public:
     int id;
     int type;
 
+    bool operator<(const StationRequest &rhs) const;
+
 public:
     StationRequest(int id, int type);
 };

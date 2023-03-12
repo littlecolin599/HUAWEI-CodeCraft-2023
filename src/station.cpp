@@ -78,3 +78,8 @@ StationInfo::StationInfo(int type): type(type) {
 
 
 StationRequest::StationRequest(int id, int type) : id(id), type(type) {}
+
+bool StationRequest::operator<(const StationRequest &rhs) const {
+    if (this->type == rhs.type) return this->id > rhs.id;
+    return this->type < rhs.type;
+}

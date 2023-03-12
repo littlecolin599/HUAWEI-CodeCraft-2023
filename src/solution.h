@@ -13,6 +13,7 @@
 #include "robot.h"
 
 const int K = 50;
+const int TYPE_NUM = 9;
 typedef long long ll;
 
 
@@ -37,7 +38,6 @@ public:
 extern unordered_map<int, Station*> station_map;
 extern unordered_map<int, Robot*> robot_map;
 extern CurrentState currentState;
-extern vector<bitset<K>> product_bst;
-
+extern vector<vector<int>> destination_table;
 
 #endif //HUAWEI_CODECRAFT_2023_SOLUTION_H
