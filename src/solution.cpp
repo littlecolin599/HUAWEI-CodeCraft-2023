@@ -35,18 +35,20 @@ CurrentState::CurrentState() : fps(0), money(0),
 // 读取完成之后，处理每一帧的数据
 void Solution::deal_fps() {
 
+    unordered_set<int> used_type;
     for (auto *station : station_list) {
         int type = station->type;
-        if (!request_id.count(station->id) && station->product == 1 && !station->hasRequest && !destination_table[type].empty()) {
+        if (!request_id.count(station->id) && station->product == 1 && !used_type.count(type)) {
             //std::cerr << "request size " << destination_table[type].size() << endl;
-            if (station->id == 29) {
-                if (cnt == 5) {
-                    sleep(100);
-                }
-                std::cerr << "product " << station->product << " " << endl;
-                std::cerr << "push request 29" << endl;
-                cnt ++;
-            }
+//            if (station->id == 29) {
+//                if (cnt == 5) {
+//                    sleep(100);
+//                }
+//                std::cerr << "product " << station->product << " " << endl;
+//                std::cerr << "push request 29" << endl;
+//                cnt ++;
+//            }
+            used_type.insert(type);
             if (request_id.count(station->id)) continue;
             station_req_queue.push(new StationRequest(station->id, station->type));
             request_id.insert(station->id);
