@@ -29,7 +29,7 @@ void Solution::deal_fps() {
 
     for (auto *station : station_list) {
         int type = station->type;
-        if (station->product == 1 && destination_table[type].size() > 0) {
+        if (station->product == 1 && !destination_table[type].empty()) {
             station_req_queue.push(new StationRequest(station->id, station->type));
         }
     }
@@ -60,6 +60,9 @@ void Solution::deal_work() {
                 cout << "buy " << robot->id << endl;
                 robot->status = SELL;
                 int type = robot->belong;
+                if (destination_table[type].empty()) {
+                    std::cerr << "destination error " << endl;
+                }
                 robot->destination = destination_table[type].back();
                 destination_table[type].pop_back();
             } else if (robot->status == SELL) {
