@@ -39,5 +39,4 @@ extern unordered_map<int, Station*> station_map;
 extern unordered_map<int, Robot*> robot_map;
 extern CurrentState currentState;
 extern vector<vector<int>> destination_table;
-
 #endif //HUAWEI_CODECRAFT_2023_SOLUTION_H

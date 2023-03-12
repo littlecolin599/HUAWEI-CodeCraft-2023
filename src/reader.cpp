@@ -67,6 +67,18 @@ bool Reader::readMap() {
                 auto* s = new Station(station_id, line[i] - '0', {x, y});
                 station_map[station_id++] = s;
                 station_list.push_back(s);
+                auto type = line[i] - '0';
+                if (material_type_range.count(type)) {
+                    material_station_list.push_back(s);
+                } else if (product_type_range.count(type)){
+                    product_station_list.push_back(s);
+                } else if (consume_type_range.count(type)) {
+                    consume_station_list.push_back(s);
+                }
+                if (stationInfo.count(type) == 0) {
+                    stationInfo[type] = new StationInfo(type);
+                }
+                type_to_id[type].push_back(station_id);
                 // 初始条件下，所有机器均有购买资源需求
             } else if (line[i] == 'A') {
                 auto* r = new Robot(robot_id, {x, y});
@@ -75,6 +87,9 @@ bool Reader::readMap() {
                 robot_work_queue.push_back(r);      // 初始条件下，所有机器人都是空闲的
             }
         }
+        sort(material_station_list.begin(), material_station_list.end(), [](Station* a, Station* b) {
+            return a->type > b->type;
+        });
         height--;
     }
     return false;
@@ -91,6 +106,18 @@ void Reader::parse_k(char *text) {
     assert(item.size() == 1 && currentState.station_num == stoi(item[0]));
 }
 
+int count_1(int num)
+{
+    int count = 0;
+    while(num)
+    {
+        count += num&1;
+        num >>= 1;
+    }
+    return count;
+}
+
+
 void Reader::parse_station(int id, char *text) {
     vector<string> item = parse_line(text);
     assert(item.size() == 6);
@@ -100,18 +127,13 @@ void Reader::parse_station(int id, char *text) {
     station->material = stoi(item[4]);
     station->product = stoi(item[5]);
     int type = station->type;
-    int req_material = stationInfo[type]->whichMaterial - station->curMaterial;
-    if (type == 3 && req_material != 0) {
-        std:cerr << "req_material " << req_material << endl;
-    }
-    for (int i = 0; i < TYPE_NUM; i++) {
-        int tmp = req_material >> i;
-        if (tmp & 1) {
-            destination_table[i].push_back(id);
-            //std::cerr << "product " << i << "'s destiation is " << id << "(type == )" << type << endl;
+    int lack_material = stationInfo[type]->whichMaterial - station->curMaterial;
+    station->lack_num_of_material = count_1(lack_material);
+    for (int i = 1; i < TYPE_NUM; ++i) {
+        if (lack_material >> i & 1) {
+            material_where_is_need[i].push_back(station->id);
         }
     }
-
 }
 
 void Reader::parse_robot(int id, char *text) {

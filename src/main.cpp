@@ -13,9 +13,9 @@ int main() {
     while (scanf("%d", &frameID) != EOF) {
         currentState.fps = frameID;
         printf("%d\n", frameID);
-        if (frameID == 800) {
-            sleep(100);
-        }
+//        if (frameID == 2) {
+//            sleep(100);
+//        }
         Reader::readFps();
         Solution::deal_fps();
 /*      printf("%d\n", frameID);
