@@ -33,46 +33,59 @@ void Solution::deal_fps() {
             hasProduct_map[material_station->type].push_back(material_station->id);
             set<int> s(hasProduct_map[material_station->type].begin(), hasProduct_map[material_station->type].end());
             hasProduct_map[material_station->type].assign(s.begin(), s.end());
-            //std::cerr << "hasProduct size " << hasProduct_map[material_station->type].size() << endl;
         }
-    }
-
-    for (auto consume_station : consume_station_list) {
-
     }
 
     for (auto product_station : product_station_list) {
 
-        // 原料齐了并且没有在生产了
+        // 原料齐了并且开始生产了，此时就不缺材料了
         if (product_station->curMaterial == stationInfo[product_station->type]->whichMaterial &&
-            product_station->remain_time == -1) {
+            product_station->remain_time >= 0) {
             product_station->curMaterial = 0;
         }
 
-        if (product_station->remain_time == 0 && product_station->product == 1) {
-
-
-            product_station->hasProduct_to_sell = true;
+        // 剩余生产时间为1时，有产品生产好了，若用product_station->product == 1判断，会在机器人还没到生产台时一直判断
+        if (product_station->remain_time == 1) {
             hasProduct_map[product_station->type].push_back(product_station->id);
             set<int> s(hasProduct_map[product_station->type].begin(), hasProduct_map[product_station->type].end());
             hasProduct_map[product_station->type].assign(s.begin(), s.end());
+        }
+
+
+        if (product_station->product == 1) {
+            product_station->hasProduct_to_sell = true;
             if (material_where_is_need[product_station->type].empty()) continue;  // 生产好了，但是不需要它
+            if (product_station->has_been_ordered) continue;
             for (auto robot : robot_list) {
                 if (robot->status == DEFAULT) {
-                    std::cerr << "I want to sell my product" << '\n';
+                    robot->ret_destination = -1;
+                    std::cerr << "-----------------------------------------------------" << '\n';
+                    std::cerr << "I want to sell my product" << product_station->type << '\n';
                     int sell_station_type = material_where_to_sell[product_station->type][0];
-                    robot->ret_destination = type_to_id[sell_station_type].back();
+                    std::cerr << "to sell station type" << sell_station_type << '\n';
+                    for (auto id : type_to_id[sell_station_type]) {
+                        if (sell_station_type == 7) {
+                            std::cerr << "type 7,  id =  " << id << "'s curMaterial is " << station_map[id]->curMaterial << endl;
+                        }
+                        if (((station_map[id]->curMaterial >> product_station->type) & 1) == 0) {
+                            std::cerr << "Yes, I can sell to this station " << "\n";
+                            robot->ret_destination = id;
+                            break;
+                        }
+                    }
+                    std::cerr << "to sell station id" << robot->ret_destination  << '\n';
                     if (type_to_id[sell_station_type].empty()) continue;
-                    type_to_id[sell_station_type].pop_back();
-//                    if ((station_map[robot->ret_destination]->curMaterial >> product_station->type) & 1) {
-//                        if (type_to_id[sell_station_type].empty()) continue;
-//                        robot->ret_destination = type_to_id[sell_station_type].back();
-//                        type_to_id[sell_station_type].pop_back();
-//                    }
+                    if (robot->ret_destination == -1) break;
                     robot->status = READY_TO_BUY;
+                    product_station->has_been_ordered = true;
+                    std::cerr << "station type " << product_station->type << "'s product has been ordered" << '\n';
+                    hasProduct_map[product_station->type].pop_back();
                     station_map[robot->ret_destination]->curMaterial |= (1 << product_station->type);
+                    for (auto consume_station : consume_station_list) {
+                        consume_station->curMaterial = 0;
+                    }
                     robot->destination = product_station->id;
-                    std::cerr << "-------------" << '\n' <<
+                    std::cerr << "---------------------------------------------------------" << '\n' <<
                               "station " << product_station->id << " type " << product_station->type << '\n' <<
                               "this station's product " << product_station->type << '\n' <<
                               "this station is getting a robot " << robot->id << '\n';
@@ -100,7 +113,7 @@ void Solution::deal_fps() {
         auto cur_station = *it;
         //std::cerr << "type " << cur_station->type << " is needed by " << material_where_is_need[cur_station->type].size() << '\n';
         if (material_where_is_need[cur_station->type].empty()) {
-            std::cerr << "the product " << cur_station->type << " is no need " << endl;
+            //std::cerr << "the product " << cur_station->type << " is no need " << endl;
             continue;
         }
         if (cur_station->lack_num_of_material == 0 && cur_station->remain_time == 0) {
@@ -136,6 +149,7 @@ void Solution::deal_fps() {
                                   "this station is getting a robot " << robot->id << '\n';
                         std::cerr << "robot's destination is " << robot->destination << endl;
                         std::cerr << "robot is going to buy " << station_map[robot->destination]->type << '\n';
+                        std::cerr << "but is it has product ? " << "hasProduct_map size: " << hasProduct_map[buy_station_type].size() << '\n';
                         std::cerr << " --------------------------------------------------------------" << '\n';
 
                         robot->ret_destination = cur_station->id;
@@ -174,6 +188,7 @@ void Solution::deal_work() {
             } else if (robot->status == READY_TO_SELL) {
                 if ((station_map[robot->destination]->material >> robot->belong & 1) == 0 || true) {
                     robot->status = SELL;
+                    station_map[robot->destination]->has_been_ordered = false;
                     //station_map[robot->destination]->curMaterial |= (1 << robot->belong);
                     cout << "sell " << robot->id << endl;
 //                    std::cerr << "sell " << robot->id << " type " << robot->belong << endl;
@@ -199,16 +214,17 @@ void Solution::do_action(Robot* robot) {
                                 station->coordinate.first - robot->coordinate.first);
 
     double delta_rad = rad - robot->direction;
-    if (delta_rad < -1) delta_rad =  3.1415926 - delta_rad;
+    if (delta_rad > 3.5) delta_rad =  -delta_rad;
 
     int lineSpeed = 4;
 
-    if (calc_dis(station_map[robot->destination]->coordinate, robot->coordinate) < 3) {
+    if (calc_dis(station_map[robot->destination]->coordinate, robot->coordinate) < 4) {
         lineSpeed = 1;
+        delta_rad = 1.4 * delta_rad;
     }
     if (delta_rad < -3.1415926) delta_rad = -3.1415926;
     if (delta_rad > 3.1415026) delta_rad = 3.1415926;
-    cout << "rotate " << robot->id << " " << delta_rad * 1.2 << endl;
+    cout << "rotate " << robot->id << " " << delta_rad << endl;
     cout << "forward " << robot->id << " " << lineSpeed << endl;
 }
 

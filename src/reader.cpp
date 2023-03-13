@@ -19,7 +19,7 @@ bool Reader::readFps() {
     int station_id = 0;
     for (int i = 0; i < TYPE_NUM; ++i) {
         destination_table[i].clear();
-        material_where_is_need[i].clear();  // 清空的位置很关键
+        material_where_is_need[i].clear();
     }
     while (fgets(line, sizeof line, stdin)) {
         if (line[0] == 'O' && line[1] == 'K') {
