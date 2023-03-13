@@ -19,6 +19,7 @@ bool Reader::readFps() {
     int station_id = 0;
     for (int i = 0; i < TYPE_NUM; ++i) {
         destination_table[i].clear();
+        material_where_is_need[i].clear();  // 清空的位置很关键
     }
     while (fgets(line, sizeof line, stdin)) {
         if (line[0] == 'O' && line[1] == 'K') {
@@ -65,7 +66,7 @@ bool Reader::readMap() {
             float x = 0.25 * i + 0.25;
             if (line[i] >= '1' && line[i] <= '9') {
                 auto* s = new Station(station_id, line[i] - '0', {x, y});
-                station_map[station_id++] = s;
+                station_map[station_id] = s;
                 station_list.push_back(s);
                 auto type = line[i] - '0';
                 if (material_type_range.count(type)) {
@@ -78,7 +79,7 @@ bool Reader::readMap() {
                 if (stationInfo.count(type) == 0) {
                     stationInfo[type] = new StationInfo(type);
                 }
-                type_to_id[type].push_back(station_id);
+                type_to_id[type].push_back(station_id++);  // 前面++导致多了一个1
                 // 初始条件下，所有机器均有购买资源需求
             } else if (line[i] == 'A') {
                 auto* r = new Robot(robot_id, {x, y});
