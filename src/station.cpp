@@ -53,6 +53,7 @@ StationInfo::StationInfo(int type): type(type) {
             whichProduct = 4;
             material_where_to_sell[1].push_back(4);
             material_where_to_sell[2].push_back(4);
+
             break;
         case 5:
             whichMaterial = 10;  // 1010

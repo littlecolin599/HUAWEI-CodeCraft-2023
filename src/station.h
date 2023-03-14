@@ -41,6 +41,7 @@ public:
     bool hasRequest;
     int lack_num_of_material;
     bool has_been_ordered;
+    double distance_to_buy;
     Station(int id, int type, const PFF &coordinate, int remainTime, int material, int product);
     Station(int id, int type, const PFF &coordinate);
 };
