@@ -169,6 +169,7 @@ void Solution::deal_fps() {
 
                         robot->ret_destination = cur_station->id;
                         robot->status = READY_TO_BUY;
+                        station_map[buy_station_id]->has_been_ordered = true;
                         hasProduct_map[cur_lack_material_type].pop_back();
                         cur_station->curMaterial |= (1 << station_map[buy_station_id]->type);
                         lack_material = stationInfo[cur_station->type]->whichMaterial - cur_station->curMaterial;
@@ -224,23 +225,54 @@ void Solution::deal_work() {
 }
 
 void Solution::do_action(Robot* robot) {
-    Station* station = station_map[robot->destination];
+    Station* station = station_map[robot->destination];  // what's meaning
 
     double rad = atan2(station->coordinate.second - robot->coordinate.second,
-                                station->coordinate.first - robot->coordinate.first);
+                       station->coordinate.first - robot->coordinate.first); // except angle, relative to x positive [-pi,pi]
 
-    double delta_rad = (rad - robot->direction) * 1.2;
-    if (delta_rad > 3.5) delta_rad =  -delta_rad;
+    double delta_rad = rad - robot->direction; // delt angle between except angle and current angle
+    if (delta_rad > 3.1415) {delta_rad = (- 3.14159*2 + delta_rad) ;} // 负表示 顺时针旋转
+    else if(delta_rad < -3.1415) {delta_rad = (3.14159*2 + delta_rad);} // 正表示 逆时针旋转
+
+    double Output_delta_rad = delta_rad/0.02*10; // 假设调整 10帧 到达 指定角度
+
+
 
     int lineSpeed = 6;
+//    double MaxPositiveVelocity = 6 ;
+//    double MaxNegativeVelocity = 2;
+//    double MaxTurnSpeed = 3.1415926;
+//    double radius = 0.45; // 0.45 or 053;
+//    double AcceleratedSpeed = 250/ (20*3.14159*radius*radius); // a = F/m = F / (tho*s) = F/ (tho*pi*r^2)
+//    double DecreaseTime = (6-0.5)/AcceleratedSpeed;
+//    double x = MaxPositiveVelocity*DecreaseTime + AcceleratedSpeed*DecreaseTime*DecreaseTime/2; // 从满速到零速需要的路程
 
-    if (calc_dis(station_map[robot->destination]->coordinate, robot->coordinate) < 6) {
-        lineSpeed = 1;
-        delta_rad = 1.4 * delta_rad;
+    double V_temp = calc_dis(station_map[robot->destination]->coordinate, robot->coordinate);
+    // 送货
+    if(0){
+        if ( V_temp <= 2 && V_temp > 0.3 && delta_rad < 3.1415926/2) {
+            lineSpeed = lineSpeed * V_temp/2;
+            //neSpeed = calc_Velocity(robot->velocity.first,robot->velocity.second) - AcceleratedSpeed*0.02;
+            Output_delta_rad = delta_rad * V_temp/2;
+            if ( lineSpeed <= 0.5) {lineSpeed = 0.5;}
+        }else if(V_temp <= 0.3 && delta_rad >= 3.1415926/2){ lineSpeed = 6; Output_delta_rad = max(3.1415926,delta_rad/0.02);}
+        else if(V_temp <= 0.3 && delta_rad < 3.1415926/2){ lineSpeed = 6; Output_delta_rad = max(3.1415926,delta_rad/0.02);}
     }
-    if (delta_rad < -3.1415926) delta_rad = -3.1415926;
-    if (delta_rad > 3.1415026) delta_rad = 3.1415926;
-    cout << "rotate " << robot->id << " " << delta_rad << endl;
+    // 取货
+
+    if(1){
+        if ( V_temp <= 2 && V_temp > 0.3 && delta_rad < 3.1415926/2) {
+            // lineSpeed = lineSpeed/2 * V_temp/2;
+            //neSpeed = calc_Velocity(robot->velocity.first,robot->velocity.second) - AcceleratedSpeed*0.02;
+            Output_delta_rad = delta_rad/0.1;
+            lineSpeed = 1 ;
+//            if ( lineSpeed <= 0.5) {lineSpeed = 0.5;}
+        }
+    }
+
+    if (Output_delta_rad>=3.14158){Output_delta_rad = +3.14158;}
+    if (Output_delta_rad<=-3.14158){Output_delta_rad = -3.14158;}
+    cout << "rotate " << robot->id << " " << Output_delta_rad << endl;
     cout << "forward " << robot->id << " " << lineSpeed << endl;
 }
 
