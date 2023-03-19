@@ -15,6 +15,10 @@ unordered_map<int, Station *> station_map;
 unordered_map<int, Robot *> robot_map;
 vector<vector<int>> destination_table(TYPE_NUM);
 unordered_map<int, vector<int>> hasProduct_map;
+int frameID;
+
+PID pid = PID(0.02, 3.1415, -3.1415, 2, 0.5, 0.5);
+
 
 CurrentState currentState;
 CurrentState::CurrentState() : fps(0), money(0),
@@ -60,12 +64,12 @@ void Solution::deal_fps() {
 //                std::cerr << "has_been_ordered ?" << (product_station->has_been_ordered ? "yes" : "no") << '\n';
 //                std::cerr << "********************************************" << '\n';
 //            }
-            if (product_station->type == 7) {
-                std::cerr << "********************************************" << '\n';
-                std::cerr << "I want to sell my product " << product_station->type << '\n';
-                std::cerr << "id:" << product_station->id << "'s product has_been_ordered ?" << (product_station->has_been_ordered ? "yes" : "no") << '\n';
-                std::cerr << "********************************************" << '\n';
-            }
+//            if (product_station->type == 7) {
+//                std::cerr << "********************************************" << '\n';
+//                std::cerr << "I want to sell my product " << product_station->type << '\n';
+//                std::cerr << "id:" << product_station->id << "'s product has_been_ordered ?" << (product_station->has_been_ordered ? "yes" : "no") << '\n';
+//                std::cerr << "********************************************" << '\n';
+//            }
             product_station->hasProduct_to_sell = true;
             if (product_station->type != 7 && material_where_is_need[product_station->type].empty()) continue;  // 生产好了，但是不需要它
             if (product_station->has_been_ordered) continue;
@@ -117,6 +121,7 @@ void Solution::deal_fps() {
     }
 
 
+
     sort(product_station_list.begin(), product_station_list.end(), [](Station* a, Station* b) {
         if (a->lack_num_of_material == 0 && b->lack_num_of_material != 0) return true;
         else if (a->lack_num_of_material != 0 && b->lack_num_of_material == 0) return false;
@@ -126,6 +131,7 @@ void Solution::deal_fps() {
 
     for (auto it = product_station_list.rbegin(); it != product_station_list.rend(); ++it) {
         auto cur_station = *it;
+
         //std::cerr << "type " << cur_station->type << " is needed by " << material_where_is_need[cur_station->type].size() << '\n';
         if (material_where_is_need[cur_station->type].empty()) {
             //std::cerr << "the product " << cur_station->type << " is no need " << endl;
@@ -185,7 +191,10 @@ void Solution::deal_fps() {
 
 void Solution::deal_work() {
     for (auto robot : robot_list) {
-        if (robot->status == DEFAULT) continue;
+        if (robot->status == DEFAULT) {
+            std::cerr << "there are default robot" << '\n';
+            continue;
+        }
         if (robot->destination == robot->station) {
             if (robot->status == READY_TO_BUY) {
                 if (station_map[robot->destination]->product == 1) {
@@ -224,7 +233,7 @@ void Solution::deal_work() {
     }
 }
 
-void Solution::do_action(Robot* robot) {
+void do_action(Robot* robot) {
     Station* station = station_map[robot->destination];  // what's meaning
 
     double rad = atan2(station->coordinate.second - robot->coordinate.second,
@@ -233,8 +242,10 @@ void Solution::do_action(Robot* robot) {
     double delta_rad = rad - robot->direction; // delt angle between except angle and current angle
     if (delta_rad > 3.1415) {delta_rad = (- 3.14159*2 + delta_rad) ;} // 负表示 顺时针旋转
     else if(delta_rad < -3.1415) {delta_rad = (3.14159*2 + delta_rad);} // 正表示 逆时针旋转
-
     double Output_delta_rad = delta_rad/0.02*10; // 假设调整 10帧 到达 指定角度
+
+
+    Output_delta_rad += pid.calculate(0, delta_rad);
 
 
 
@@ -247,7 +258,7 @@ void Solution::do_action(Robot* robot) {
 //    double DecreaseTime = (6-0.5)/AcceleratedSpeed;
 //    double x = MaxPositiveVelocity*DecreaseTime + AcceleratedSpeed*DecreaseTime*DecreaseTime/2; // 从满速到零速需要的路程
 
-    double V_temp = calc_dis(station_map[robot->destination]->coordinate, robot->coordinate);
+    double V_temp = Solution::calc_dis(station_map[robot->destination]->coordinate, robot->coordinate);
     // 送货
     if(0){
         if ( V_temp <= 2 && V_temp > 0.3 && delta_rad < 3.1415926/2) {

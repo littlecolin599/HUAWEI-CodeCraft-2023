@@ -5,11 +5,12 @@
 
 using namespace std;
 
+
 int main() {
     Reader::readMap();
     puts("OK");
     fflush(stdout);
-    int frameID;
+
     while (scanf("%d", &frameID) != EOF) {
         currentState.fps = frameID;
         printf("%d\n", frameID);
